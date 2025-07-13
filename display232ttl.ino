@@ -1,26 +1,8 @@
 #include <Arduino.h>
 #include <avr/pgmspace.h>
 #include "HardwareSerial.h"
-#include "PinConfig.hpp"
+#include "Config.hpp"
 #include "SymbolTable.hpp"
-
-/**
- * EN: The number of symbols on the display.
- * CZ: Počet symbolů na displeji.
- */
-#define DISPLAY_SYMBOL_COUNT 8
-
-/**
- * EN: The baudrate of the serial interface.
- * CZ: Přenosová rychlost sériového rozhraní.
- */
-#define SERIAL_BAUDRATE 9600
-
-/**
- * EN: The delay between automatic refreshes of the display.
- * CZ: Prodleva mezi automatickými obnoveními displeje.
- */
-#define AUTOREFRESH_DELAY 1000
 
 /**
  * EN: An array that contains the current state of each symbol on the display.
