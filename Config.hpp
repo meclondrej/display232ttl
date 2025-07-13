@@ -18,6 +18,10 @@
  */
 #define AUTOREFRESH_DELAY 1000
 
+/**
+ * EN: Numbers of pins connected to the shift register.
+ * CZ: Čísla pinů připojených k posuvnému registru.
+ */
 #define PIN_OE 3
 #define PIN_RCLK 4
 #define PIN_SRCLR 5
