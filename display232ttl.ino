@@ -39,7 +39,7 @@ void pulse_pin(uint8_t pin) {
  */
 void upload_buffer() {
     for (size_t i = DISPLAY_SYMBOL_COUNT; i--;)
-        for (uint8_t mask = 1; mask; mask <<= 1) {
+        for (uint8_t mask = 0x80; mask; mask >>= 1) {
             digitalWrite(PIN_SER, (display_buffer[i] & mask) ? HIGH : LOW);
             pulse_pin(PIN_SRCLK);
         }

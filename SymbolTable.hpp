@@ -10,7 +10,7 @@
  *
  * |-A-|
  * F   B
- * |-G-|   => 0bABCDEFGP
+ * |-G-|   => 0bPGFEDCBA
  * E   C
  * |-D-| P
  */
