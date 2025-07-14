@@ -22,7 +22,7 @@
  * EN: A flag that determines whether the SRCLR pin is available.
  * CZ: Vlajka která rozhoduje, jestli je pin SRCLR dostupný.
  */
-#define SRCLR_AVAILABLE 1
+#define SRCLR_AVAILABLE 0
 
 /**
  * EN: Numbers of pins connected to the shift register.
