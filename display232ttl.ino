@@ -106,6 +106,22 @@ void set_brightness(uint8_t level) {
 }
 
 /**
+ * EN: Awaits an incoming byte.
+ * CZ: Vyčká na příchozí bajt
+ */
+uint8_t await_input() {
+    while (!Serial.available()) {
+        uint16_t now = millis();
+        if (last_autorefresh > now ||
+            now - last_autorefresh >= AUTOREFRESH_DELAY) {
+            upload_buffer();
+            last_autorefresh = now;
+        }
+    }
+    return Serial.read();
+}
+
+/**
  * EN: Executes a special function based on a numeric identifier. The caller
  * guarantees that the parameter is between 0x00 and 0x19 (inclusive).
  * CZ: Spustí speciální funkci podle číselného identifikátoru. Volající
@@ -133,23 +149,10 @@ void exec_special_function(uint8_t code) {
         case 0x01:
             display_buffer[DISPLAY_SYMBOL_COUNT - 1] |= 0x80;
             return;
+        case 0x02:
+            push_back_symbol(await_input());
+            return;
     }
-}
-
-/**
- * EN: Awaits an incoming byte.
- * CZ: Vyčká na příchozí bajt
- */
-uint8_t await_input() {
-    while (!Serial.available()) {
-        uint16_t now = millis();
-        if (last_autorefresh > now ||
-            now - last_autorefresh >= AUTOREFRESH_DELAY) {
-            upload_buffer();
-            last_autorefresh = now;
-        }
-    }
-    return Serial.read();
 }
 
 /**
