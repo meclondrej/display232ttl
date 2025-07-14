@@ -87,6 +87,9 @@ uint8_t lookup_symbol(uint8_t character) {
  * symbol na danou hodnotu
  */
 void push_back_symbol(uint8_t symbol) {
+    if (buffer_was_uploaded)
+        clear_display_buffer();
+    buffer_was_uploaded = 0;
     for (size_t i = 0; i < DISPLAY_SYMBOL_COUNT - 1; i++)
         display_buffer[i] = display_buffer[i + 1];
     display_buffer[DISPLAY_SYMBOL_COUNT - 1] = symbol;
@@ -174,9 +177,8 @@ void loop() {
         decimal_point_bit = 1;
         received_byte -= 0x80;
     }
-    if (buffer_was_uploaded)
-        clear_display_buffer();
-    buffer_was_uploaded = 0;
+    if (received_byte <= 0x19)
+        return;
     uint8_t symbol = lookup_symbol(received_byte);
     push_back_symbol(symbol);
     if (decimal_point_bit)
