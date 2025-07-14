@@ -103,6 +103,37 @@ void set_brightness(uint8_t level) {
 }
 
 /**
+ * EN: Executes a special function based on a numeric identifier. The caller
+ * guarantees that the parameter is between 0x00 and 0x19 (inclusive).
+ * CZ: Spustí speciální funkci podle číselného identifikátoru. Volající
+ * garantuje že paramter je mezi 0x00 a 0x19 (inkluzivně).
+ */
+void exec_special_function(uint8_t code) {
+    if (code >= 0x10 && code <= 0x17) {
+        set_brightness(code - 0x10);
+        return;
+    }
+    switch (code) {
+        case 0x00: // null
+        case 0x0A: // line feed
+        case 0x0D: // carriage return
+            if (buffer_was_uploaded)
+                return;
+            upload_buffer();
+            buffer_was_uploaded = 1;
+            return;
+        case 0x0C: // form feed
+            clear_display();
+            clear_display_buffer();
+            buffer_was_uploaded = 1;
+            return;
+        case 0x01:
+            display_buffer[DISPLAY_SYMBOL_COUNT - 1] |= 0x80;
+            return;
+    }
+}
+
+/**
  * EN: Initial setup.
  * CZ: Prvotní nastavení.
  */
@@ -134,33 +165,20 @@ void loop() {
         }
     }
     received_byte = Serial.read();
-    if (received_byte > 0x7F)
-        return;
-    if (received_byte >= 0x20) {
-        if (buffer_was_uploaded)
-            clear_display_buffer();
-        buffer_was_uploaded = 0;
-        uint8_t symbol = lookup_symbol(received_byte);
-        push_back_symbol(symbol);
+    if (received_byte <= 0x19) {
+        exec_special_function(received_byte);
         return;
     }
-    if (received_byte >= 0x10 && received_byte <= 0x17) {
-        set_brightness(received_byte - 0x10);
-        return;
+    uint8_t decimal_point_bit = 0;
+    if (received_byte >= 0x80) {
+        decimal_point_bit = 1;
+        received_byte -= 0x80;
     }
-    switch (received_byte) {
-        case 0x00: // null
-        case 0x0A: // line feed
-        case 0x0D: // carriage return
-            if (buffer_was_uploaded)
-                return;
-            upload_buffer();
-            buffer_was_uploaded = 1;
-            return;
-        case 0x0C: // form feed
-            clear_display();
-            clear_display_buffer();
-            buffer_was_uploaded = 1;
-            return;
-    }
+    if (buffer_was_uploaded)
+        clear_display_buffer();
+    buffer_was_uploaded = 0;
+    uint8_t symbol = lookup_symbol(received_byte);
+    push_back_symbol(symbol);
+    if (decimal_point_bit)
+        display_buffer[DISPLAY_SYMBOL_COUNT - 1] |= 0x80;
 }
