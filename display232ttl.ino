@@ -137,6 +137,22 @@ void exec_special_function(uint8_t code) {
 }
 
 /**
+ * EN: Awaits an incoming byte.
+ * CZ: Vyčká na příchozí bajt
+ */
+uint8_t await_input() {
+    while (!Serial.available()) {
+        uint16_t now = millis();
+        if (last_autorefresh > now ||
+            now - last_autorefresh >= AUTOREFRESH_DELAY) {
+            upload_buffer();
+            last_autorefresh = now;
+        }
+    }
+    return Serial.read();
+}
+
+/**
  * EN: Initial setup.
  * CZ: Prvotní nastavení.
  */
@@ -158,16 +174,7 @@ void setup() {
  * CZ: Hlavní smyčka.
  */
 void loop() {
-    uint8_t received_byte;
-    while (!Serial.available()) {
-        uint16_t now = millis();
-        if (last_autorefresh > now ||
-            now - last_autorefresh >= AUTOREFRESH_DELAY) {
-            upload_buffer();
-            last_autorefresh = now;
-        }
-    }
-    received_byte = Serial.read();
+    uint8_t received_byte = await_input();
     if (received_byte <= 0x19) {
         exec_special_function(received_byte);
         return;
@@ -180,7 +187,7 @@ void loop() {
     if (received_byte <= 0x19)
         return;
     uint8_t symbol = lookup_symbol(received_byte);
-    push_back_symbol(symbol);
     if (decimal_point_bit)
-        display_buffer[DISPLAY_SYMBOL_COUNT - 1] |= 0x80;
+        symbol |= 0x80;
+    push_back_symbol(symbol);
 }
