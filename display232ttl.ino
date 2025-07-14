@@ -131,6 +131,8 @@ void loop() {
     if (received_byte > 0x7F)
         return;
     if (received_byte >= 0x20) {
+        if (buffer_was_uploaded)
+            clear_display_buffer();
         buffer_was_uploaded = 0;
         uint8_t symbol = lookup_symbol(received_byte);
         push_back_symbol(symbol);
@@ -147,7 +149,6 @@ void loop() {
             if (buffer_was_uploaded)
                 return;
             upload_buffer();
-            clear_display_buffer();
             buffer_was_uploaded = 1;
             return;
         case 0x0C: // form feed
