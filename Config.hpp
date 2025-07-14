@@ -19,6 +19,12 @@
 #define AUTOREFRESH_DELAY 1000
 
 /**
+ * EN: A flag that determines whether the SRCLR pin is available.
+ * CZ: Vlajka která rozhoduje, jestli je pin SRCLR dostupný.
+ */
+#define SRCLR_AVAILABLE 1
+
+/**
  * EN: Numbers of pins connected to the shift register.
  * CZ: Čísla pinů připojených k posuvnému registru.
  */

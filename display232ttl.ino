@@ -51,7 +51,13 @@ void upload_buffer() {
  * CZ: Vynuluje displej.
  */
 void clear_display() {
-    pulse_pin(PIN_SRCLR);
+    if (SRCLR_AVAILABLE)
+        pulse_pin(PIN_SRCLR);
+    else {
+        digitalWrite(PIN_SER, LOW);
+        for (size_t i = 8 * DISPLAY_SYMBOL_COUNT; i--;)
+            pulse_pin(PIN_SRCLK);
+    }
     pulse_pin(PIN_RCLK);
 }
 
