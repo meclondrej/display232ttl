@@ -122,6 +122,88 @@ uint8_t await_input() {
 }
 
 /**
+ * EN: Plays the demo.
+ * CZ: Přehraje demo.
+ */
+void play_demo() {
+    clear_display_buffer();
+    clear_display();
+
+    // text blink
+    
+    const char demo_str[] = "HELLO";
+    for (size_t i = 0; i < sizeof(demo_str) - 1; i++) {
+        push_back_symbol(lookup_symbol(demo_str[i]));
+        upload_buffer();
+        delay(300);
+    }
+    for (int i = 0; i < 3; i++) {
+        clear_display();
+        delay(200);
+        upload_buffer();
+        delay(200);
+    }
+
+    // alphabet + numbers
+    
+    clear_display();
+    clear_display_buffer();
+    for (uint8_t c = 'A'; c <= 'Z'; c++) {
+        push_back_symbol(lookup_symbol(c));
+        upload_buffer();
+        delay(200);
+    }
+    for (uint8_t c = '0'; c <= '9'; c++) {
+        push_back_symbol(lookup_symbol(c));
+        upload_buffer();
+        delay(200);
+    }
+
+    // temperature
+    
+    clear_display();
+    clear_display_buffer();
+    const char temperature_str[] = "273\x7F";
+    for (size_t i = 0; i < sizeof(temperature_str) - 1; i++) {
+        uint8_t symbol = lookup_symbol(temperature_str[i]);
+        if (i == 1)
+            symbol |= 0x80;
+        push_back_symbol(symbol);
+    }
+    upload_buffer();
+    delay(3000);
+
+    // loading symbols
+    
+    for (int i = 0; i < 5; i++)
+        for (uint8_t symbol = 1; symbol != 0x40; symbol <<= 1) {
+            for (int j = 0; j < DISPLAY_SYMBOL_COUNT; j++)
+                push_back_symbol(symbol);
+            upload_buffer();
+            delay(100);
+        }
+
+    // brightness
+
+    for (int i = 0; i < DISPLAY_SYMBOL_COUNT; i++)
+        push_back_symbol(0xFF);
+    upload_buffer();
+    for (uint8_t br = 7; br--;) {
+        set_brightness(br);
+        delay(200);
+    }
+    for (uint8_t br = 0; br < 8; br++) {
+        set_brightness(br);
+        delay(200);
+    }
+
+    // reset
+
+    clear_display();
+    clear_display_buffer();
+}
+
+/**
  * EN: Executes a special function based on a numeric identifier. The caller
  * guarantees that the parameter is between 0x00 and 0x19 (inclusive).
  * CZ: Spustí speciální funkci podle číselného identifikátoru. Volající
@@ -151,6 +233,9 @@ void exec_special_function(uint8_t code) {
             return;
         case 0x02:
             push_back_symbol(await_input());
+            return;
+        case 0x03:
+            play_demo();
             return;
     }
 }
