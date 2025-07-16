@@ -102,7 +102,7 @@ void push_back_symbol(uint8_t symbol) {
  * (inkluzivně).
  */
 void set_brightness(uint8_t level) {
-    analogWrite(PIN_OE, (7 - level) * 32);
+    analogWrite(PIN_OE, (7 - level) * 36);
 }
 
 /**
