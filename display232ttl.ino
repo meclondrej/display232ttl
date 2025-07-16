@@ -128,6 +128,7 @@ uint8_t await_input() {
 void play_demo() {
     clear_display_buffer();
     clear_display();
+    set_brightness(7);
 
     // text blink
     
